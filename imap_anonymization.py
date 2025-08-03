@@ -37,18 +37,26 @@ def mailbox_to_json():
     config = dotenv_values(".env")
     MAIL_USERNAME = config["MAIL_USERNAME"]
     MAIL_PASSWORD = config["MAIL_PASSWORD"]
+    OUTPUT_PATH = config["OUTPUT_PATH"]
     CUTOFF_DATE = date(2025, 8, 2)
-    OUTPUT_PATH = "C:\\Users\\arnel\\Projects\\anonymization\\mailbox.json"
+    BATCH_SIZE = 2
     records = []
+    count = 1
 
     with MailBox("imap.gmail.com").login(MAIL_USERNAME, MAIL_PASSWORD, "[Gmail]/Sent Mail") as mb:
-        for email in mb.fetch(AND(date_gte=CUTOFF_DATE), reverse=True, mark_seen=False):
-            records.append ({
-                "subject" : email.subject,
-                "body" : anonymize_email(flatten_email(email.text))
-            })
-
-    with open(OUTPUT_PATH, 'w', encoding='utf-8') as f:
-        json.dump(records, f, indent=2)
+        with open(OUTPUT_PATH, 'w', encoding='utf-8') as f:
+            for email in mb.fetch(AND(date_gte=CUTOFF_DATE), reverse=True, mark_seen=False):
+                record = {
+                    "subject": email.subject,
+                    "body": anonymize_email(flatten_email(email.text))
+                }
+                f.write(json.dumps(record) + '\n')
+                if count < BATCH_SIZE:
+                    count += 1
+                else:
+                    break
 
 mailbox_to_json()
+
+### think about checkpointing and rate limits!!
+### check out this link https://support.google.com/a/answer/1071518
