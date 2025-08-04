@@ -5,6 +5,8 @@ from imap_tools import MailBox, AND
 from dotenv import dotenv_values
 from datetime import date
 import json
+import re
+
 
 def setup_analyzer():
     configuration = {
@@ -19,13 +21,22 @@ def setup_analyzer():
     return analyzer
 
 
+def anonymize_regex(text):
+    IBAN_pattern = re.compile(r"\b[A-Z]{2}[ .-]?[0-9]{2}(?:[ .-]?[0-9A-Z]{4}){3,4}\b", re.IGNORECASE)
+    SSN_pattern = re.compile(r"\b(?:\d[ .-]?){10,12}\b", re.IGNORECASE)
+
+    text = IBAN_pattern.sub("<IBAN>", text)
+    text = SSN_pattern.sub("<SSN / PHONE>", text)
+    return text
+
+
 def anonymize_email(text):
     analyzer = setup_analyzer()
     anonymizer = AnonymizerEngine()
 
+    text = anonymize_regex(text)
     results = analyzer.analyze(text=text, language="nl")
     anonymized_result = anonymizer.anonymize(text=text, analyzer_results=results)
-
     return anonymized_result.text
 
 
@@ -39,7 +50,7 @@ def mailbox_to_json():
     MAIL_PASSWORD = config["MAIL_PASSWORD"]
     OUTPUT_PATH = config["OUTPUT_PATH"]
     CUTOFF_DATE = date(2025, 8, 2)
-    BATCH_SIZE = 2
+    BATCH_SIZE = 4
     records = []
     count = 1
 
@@ -50,7 +61,7 @@ def mailbox_to_json():
                     "subject": email.subject,
                     "body": anonymize_email(flatten_email(email.text))
                 }
-                f.write(json.dumps(record) + '\n')
+                f.write(json.dumps(record, ensure_ascii=False) + '\n')
                 if count < BATCH_SIZE:
                     count += 1
                 else:
