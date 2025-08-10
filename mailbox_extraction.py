@@ -50,14 +50,14 @@ def mailbox_to_json():
     config = dotenv_values(".env")
     MAIL_USERNAME = config["MAIL_USERNAME"]
     MAIL_PASSWORD = config["MAIL_PASSWORD"]
-    OUTPUT_PATH = config["OUTPUT_PATH"]
+    MAILBOX_EXTRACTED_PATH = config["MAILBOX_EXTRACTED_PATH"]
     CUTOFF_DATE = date(2024, 8, 2)
     ITERATIONS = 100
     ITERATION_COUNTER = 0
     BATCH_SIZE = 100
 
     with MailBox("imap.gmail.com").login(MAIL_USERNAME, MAIL_PASSWORD, "[Gmail]/Sent Mail") as mb:
-        with open(OUTPUT_PATH, 'a', encoding='utf-8') as f:
+        with open(MAILBOX_EXTRACTED_PATH, 'a', encoding='utf-8') as f:
             while ITERATION_COUNTER < ITERATIONS:
                 CHECKPOINT = load_checkpoint()
                 
