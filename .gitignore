@@ -2,7 +2,4 @@
 .vscode
 __pycache__
 mailbox.jsonl
-mailbox_dev.jsonl
-test_regex_1.py
-test_regex_2.py
 checkpoint.json
