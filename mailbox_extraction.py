@@ -4,12 +4,6 @@ from datetime import date, datetime
 import json
 import re
 
-
-def clean_email(text):
-    text = text.replace('\r', '').replace('\n', ' ').replace('\t', ' ').replace('--', ' ').replace('>', ' ').replace('<', ' ')
-    text = ' '.join(text.split())
-    return text
-
 def split_email(text):
     REGEX_RESPONSE_ON = r"On(?:[\s\S]*?@[\s\S]*?)(?:\r?\n\r?\n|\r?\n>\r?\n>)"
     REGEX_RESPONSE_OP = r"Op(?:[\s\S]*?@[\s\S]*?)(?:\r?\n\r?\n|\r?\n>\r?\n>)"
@@ -72,7 +66,7 @@ def mailbox_to_json():
                     record = {
                         "uid": email.uid,
                         "subject": email.subject,
-                        "body": clean_email(split_email(email.text))
+                        "body": split_email(email.text)
                     }
                     f.write(json.dumps(record, ensure_ascii=False) + '\n')
 
