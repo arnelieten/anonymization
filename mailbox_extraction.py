@@ -18,7 +18,7 @@ def split_email(text):
 
 def load_checkpoint():
     config = dotenv_values(".env")
-    CHECKPOINT_FILE = config["CHECKPOINT_FILE"]
+    CHECKPOINT_FILE = config["CHECKPOINT_FILE_EXTRACTION"]
 
     with open(CHECKPOINT_FILE, 'r') as f:
             data = json.load(f)
@@ -29,7 +29,7 @@ def load_checkpoint():
     
 def save_checkpoint(uid):
     config = dotenv_values(".env")
-    CHECKPOINT_FILE = config["CHECKPOINT_FILE"]
+    CHECKPOINT_FILE = config["CHECKPOINT_FILE_EXTRACTION"]
 
     with open(CHECKPOINT_FILE, 'r') as f:
         data = json.load(f)

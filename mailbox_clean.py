@@ -25,7 +25,8 @@ PATTERNS = [
 ]
 
 def clean_email(text):
-    text = text.replace('\r', '').replace('\n', ' ').replace('\t', ' ').replace('--', ' ').replace('>', ' ').replace('<', ' ')
+    text = text.replace('\r', '').replace('\n', ' ').replace('\t', ' ').replace('--', ' ')
+    text = re.sub(r'<(?!PERSON>)|(?<!<PERSON)>', ' ', text)
     text = ' '.join(text.split())
     return text
 
@@ -41,18 +42,17 @@ with open(MAILBOX_EXTRACTED_PATH, "r", encoding="utf-8") as mailbox_extracted, \
         seen.add(subject)
 
         body = (obj.get("body") or "")
-        body = REGEX_GREETINGS.sub("Beste <PERSOON>, ", body)
+        body = REGEX_GREETINGS.sub("Beste <PERSON>, ", body)
         body = REGEX_CLOSING_NEOL.sub("||", body)
         body = REGEX_CLOSING_EOL.sub("", body)
 
         for pat in PATTERNS:
             body = pat.sub("", body)
+
+        body = clean_email(body)
         obj["body"] = body
 
-        obj.pop("uid", None)
-        obj.pop("subject", None)
-
-        if len(body.strip()) < 10:
+        if len(body.strip()) < 20:
             continue
 
         mailbox_cleaned.write(json.dumps(obj, ensure_ascii=False) + "\n")
