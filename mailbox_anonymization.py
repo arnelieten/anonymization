@@ -72,7 +72,7 @@ print(f"Found {len(processed_uids)} already processed messages.")
 
 
 with open(MAILBOX_CLEANED_PATH, "r", encoding="utf-8") as mailbox_cleaned, \
-     open(MAILBOX_ANONYMIZED_PATH, "a", encoding="utf-8") as mailbox_anonymized:  # append mode
+     open(MAILBOX_ANONYMIZED_PATH, "a", encoding="utf-8") as mailbox_anonymized:
 
     for line in mailbox_cleaned:
         obj = json.loads(line)
@@ -86,8 +86,7 @@ with open(MAILBOX_CLEANED_PATH, "r", encoding="utf-8") as mailbox_cleaned, \
         body = normalize_brackets(body)
         obj["body"] = body
 
-        obj.pop("uid")
-        obj.pop("subject")
-
-        mailbox_anonymized.write(json.dumps(obj, ensure_ascii=False) + "\n")
         processed_uids.add(uid)
+
+        obj.pop("subject")
+        mailbox_anonymized.write(json.dumps(obj, ensure_ascii=False) + "\n")
